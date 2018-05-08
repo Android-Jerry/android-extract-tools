@@ -902,7 +902,7 @@ function extract() {
     fi
 
     if [ -f "$SRC" ] && [ "${SRC##*.}" == "zip" ]; then
-        DUMPDIR="$TMPDIR"/system_dump
+        DUMPDIR="$TMPDIR"/vendor_dump
 
         # Check if we're working with the same zip that was passed last time.
         # If so, let's just use what's already extracted.
@@ -920,16 +920,16 @@ function extract() {
                 echo "A/B style OTA zip detected. This is not supported at this time. Stopping..."
                 exit 1
             # If OTA is block based, extract it.
-            elif [ -a "$DUMPDIR"/system.new.dat ]; then
-                echo "Converting system.new.dat to system.img"
-                python "$LINEAGE_ROOT"/vendor/lineage/build/tools/sdat2img.py "$DUMPDIR"/system.transfer.list "$DUMPDIR"/system.new.dat "$DUMPDIR"/system.img 2>&1
-                rm -rf "$DUMPDIR"/system.new.dat "$DUMPDIR"/system
-                mkdir "$DUMPDIR"/system "$DUMPDIR"/tmp
-                echo "Requesting sudo access to mount the system.img"
-                sudo mount -o loop "$DUMPDIR"/system.img "$DUMPDIR"/tmp
-                cp -r "$DUMPDIR"/tmp/* "$DUMPDIR"/system/
+            elif [ -a "$DUMPDIR"/vendor.new.dat ]; then
+                echo "Converting vendor.new.dat to vendor.img"
+                python2 "$LINEAGE_ROOT"/vendor/lineage/build/tools/sdat2img.py "$DUMPDIR"/vendor.transfer.list "$DUMPDIR"/vendor.new.dat "$DUMPDIR"/vendor.img 2>&1
+                rm -rf "$DUMPDIR"/vendor.new.dat "$DUMPDIR"/vendor
+                mkdir "$DUMPDIR"/vendor "$DUMPDIR"/tmp
+                echo "Requesting sudo access to mount the vendor.img"
+                sudo mount -o loop "$DUMPDIR"/vendor.img "$DUMPDIR"/tmp
+                cp -r "$DUMPDIR"/tmp/* "$DUMPDIR"/vendor/
                 sudo umount "$DUMPDIR"/tmp
-                rm -rf "$DUMPDIR"/tmp "$DUMPDIR"/system.img
+                rm -rf "$DUMPDIR"/tmp "$DUMPDIR"/vendor.img
             fi
         fi
 
@@ -965,8 +965,8 @@ function extract() {
         elif [ -f "$SRC/$FILE" ] && [ "$SRC" != "adb" ]; then
             TARGET="$FROM"
         else
-            TARGET="system/$FROM"
-            FILE="system/$FILE"
+            TARGET="$FROM"
+            FILE="$FILE"
         fi
 
         if [ "$SRC" = "adb" ]; then
